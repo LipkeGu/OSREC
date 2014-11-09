@@ -8,7 +8,11 @@ echo Recovery tools: %oempart%\
 label %oempart% RECOVERY
 if not exist "%oempart%\Images" MD "%oempart%\Images"
 
+if not exist "%oempart%\Images\system.wim" goto no_system_image
+
+if not exist "%oempart%\cleanssd.txt" goto prepare_disk_fail
 diskpart /s %oempart%\cleanssd.txt
+
 tools\imagex.exe /apply %oempart%\Images\system.wim 1 o:
 
 ::find the Windows Partition...
@@ -25,6 +29,15 @@ goto done
 
 :install_winre
 call scripts\install_winre.bat
+pause
+
+:prepare_disk_fail
+echo Cannot prepare disk!
+pause
+
+:no_system_image
+echo This Recovery Environment contains no system Image, please provide one!
+echo exiting... (system is unchanged) 
 pause
 
 :sysdetect_fail
